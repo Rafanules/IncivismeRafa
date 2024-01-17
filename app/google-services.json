@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "949765736242",
+    "project_id": "incivismerafa",
+    "storage_bucket": "incivismerafa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:949765736242:android:cd6b908ed84b88ba6eb92b",
+        "android_client_info": {
+          "package_name": "com.example.incivismerafa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD55IAS1eyFI99KZ9e8JqrQCsCcY4NKOc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
