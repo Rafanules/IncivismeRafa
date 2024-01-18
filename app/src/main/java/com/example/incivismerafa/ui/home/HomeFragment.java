@@ -32,6 +32,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,12 +42,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HomeFragment extends Fragment {
-
-
     private FragmentHomeBinding binding;
-
-
-
+    private FirebaseUser authUser;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
@@ -54,13 +51,19 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        SharedViewModel sharedViewModel = new ViewModelProvider(getActivity()).get(SharedViewModel.class);
+        SharedViewModel sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        SharedViewModel.getCurrentAddress().observe(getViewLifecycleOwner(), address -> {
-            binding.txtLatitud.setText(String.format(
+        sharedViewModel.getCurrentAddress().observe(getViewLifecycleOwner(), address -> {
+            binding.txtDireccio.setText(String.format(
                     "Direcció: %1$s \n Hora: %2$tr",
                     address, System.currentTimeMillis()));
         });
+
+        sharedViewModel.getCurrentLatLng().observe(getViewLifecycleOwner(), latlng -> {
+            binding.txtLatitud.setText(String.valueOf(latlng.latitude));
+            binding.txtLongitud.setText(String.valueOf(latlng.longitude));
+        });
+
         sharedViewModel.getButtonText().observe(getViewLifecycleOwner(), s -> binding.loading.setTextDirection(Integer.parseInt(s)));
         sharedViewModel.getProgressBar().observe(getViewLifecycleOwner(), visible -> {
             if (visible)
@@ -74,9 +77,9 @@ public class HomeFragment extends Fragment {
             sharedViewModel.switchTrackingLocation();
         });
 
-
-
-
+        sharedViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            authUser = user;
+        });
 
         return root;
     }

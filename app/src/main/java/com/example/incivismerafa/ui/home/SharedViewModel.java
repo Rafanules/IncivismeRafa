@@ -24,6 +24,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -42,10 +43,11 @@ public class SharedViewModel extends AndroidViewModel {
     private final MutableLiveData<String> checkPermission = new MutableLiveData<>();
     private final MutableLiveData<String> buttonText = new MutableLiveData<>();
     private final MutableLiveData<Boolean> progressBar = new MutableLiveData<>();
+    private final MutableLiveData<LatLng> currentLatLng = new MutableLiveData<>();
 
 
     private boolean mTrackingLocation;
-    FusedLocationProviderClient mFusedLocationClient;
+        FusedLocationProviderClient mFusedLocationClient;
 
     public SharedViewModel(@NonNull Application application) {
         super(application);
@@ -55,6 +57,10 @@ public class SharedViewModel extends AndroidViewModel {
 
     public void setFusedLocationClient(FusedLocationProviderClient mFusedLocationClient) {
         this.mFusedLocationClient = mFusedLocationClient;
+    }
+
+    public MutableLiveData<LatLng> getCurrentLatLng() {
+        return currentLatLng;
     }
 
     public static LiveData<String> getCurrentAddress() {
@@ -148,9 +154,11 @@ public class SharedViewModel extends AndroidViewModel {
             String resultMessage = "";
 
             try {
-                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),
 
-                        1);
+                LatLng latlng = new LatLng(location.getLatitude(), location.getLongitude());
+                currentLatLng.postValue(latlng);
+
+                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(),1);
 
 
                 if (addresses == null || addresses.size() == 0) {
@@ -171,7 +179,7 @@ public class SharedViewModel extends AndroidViewModel {
                     handler.post(() -> {
 
                         if (mTrackingLocation)
-                            currentAddress.postValue(String.format( finalResultMessage, System.currentTimeMillis()));
+                            currentAddress.postValue(String.format("Direcció: %1$s \n Hora: %2$tr",finalResultMessage, System.currentTimeMillis()));
                     });
                 }
 
@@ -180,7 +188,7 @@ public class SharedViewModel extends AndroidViewModel {
                 Log.e("INCIVISME", resultMessage, ioException);
             } catch (IllegalArgumentException illegalArgumentException) {
                 resultMessage = "Coordenades no vàlides";
-                Log.e("INCIVISME", resultMessage + ". " + "Latitude = " + location.getLatitude() + ", Longitude = " + location.getLongitude(), illegalArgumentException);
+                Log.d("INCIVISME", resultMessage + ". " + "Latitude = " + location.getLatitude() + ", Longitude = " + location.getLongitude(), illegalArgumentException);
             }
         });
 
